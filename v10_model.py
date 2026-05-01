@@ -210,6 +210,58 @@ cogs_predictions = revenue_predictions * cogs_ratio
 
 print(f"COGS ratio: {cogs_ratio:.4f}")
 
+# 10. CALCULATE PERFORMANCE METRICS
+print("\n9. CALCULATING PERFORMANCE METRICS...")
+
+# Get actual values from sample_submission
+actual = sample["Revenue"].values
+predicted = revenue_predictions
+
+# Calculate metrics
+mae = np.mean(np.abs(actual - predicted))
+rmse = np.sqrt(np.mean((actual - predicted) ** 2))
+mape = np.mean(np.abs((actual - predicted) / actual)) * 100
+r2 = 1 - (np.sum((actual - predicted) ** 2) / np.sum((actual - np.mean(actual)) ** 2))
+
+print("\n=== PERFORMANCE METRICS (vs Sample Submission) ===")
+print(f"MAE  (Mean Absolute Error):         {mae:,.2f}")
+print(f"RMSE (Root Mean Squared Error):      {rmse:,.2f}")
+print(f"MAPE (Mean Absolute % Error):      {mape:.2f}%")
+print(f"R2   (R-squared):                    {r2:.4f}")
+
+# Additional metrics
+print("\n=== ADDITIONAL METRICS ===")
+print(f"Mean Absolute Percentage Error: {mape:.2f}%")
+print(f"Prediction mean: {predicted.mean():,.2f}")
+print(f"Actual mean: {actual.mean():,.2f}")
+print(f"Difference: {(predicted.mean() - actual.mean()) / actual.mean() * 100:+.2f}%")
+
+# Save metrics to file
+metrics_df = pd.DataFrame(
+    {
+        "Metric": [
+            "MAE",
+            "RMSE",
+            "MAPE",
+            "R2",
+            "Prediction_Mean",
+            "Actual_Mean",
+            "Difference_%",
+        ],
+        "Value": [
+            mae,
+            rmse,
+            mape,
+            r2,
+            predicted.mean(),
+            actual.mean(),
+            (predicted.mean() - actual.mean()) / actual.mean() * 100,
+        ],
+    }
+)
+metrics_df.to_csv(os.path.join(workdir, "metrics.csv"), index=False)
+print("\nSaved metrics to metrics.csv")
+
 # 11. SAVE
 
 output = pd.DataFrame(
